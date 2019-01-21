@@ -2,8 +2,36 @@
 <con:testCase id="9def762b-3dc6-403e-b22c-8d301b13a0dc" discardOkResults="false" failOnError="true" failTestCaseOnErrors="true" keepSession="false" name="PetTestCase" searchProperties="true" timeout="0" xmlns:con="http://eviware.com/soapui/config">
   <con:settings>
     <con:setting id="9def762b-3dc6-403e-b22c-8d301b13a0dcfileName">PetTestCase</con:setting>
+    <con:setting id="IncludeOverview">true</con:setting>
+    <con:setting id="IncludeResults">true</con:setting>
+    <con:setting id="FlowLayout">false</con:setting>
+    <con:setting id="ErrorDetails">true</con:setting>
+    <con:setting id="IncludeCoverage">true</con:setting>
   </con:settings>
   <con:savedRecentRuns>1</con:savedRecentRuns>
+  <con:testStep type="datasource" name="ds_PetData" id="d210eab1-1a23-401d-b97b-84dcafba36cf">
+    <con:settings>
+      <con:setting id="com.eviware.soapui.impl.wsdl.teststeps.datasource.DataSourceContainer@prepared-properties">&lt;xml-fragment/></con:setting>
+    </con:settings>
+    <con:config xsi:type="con:DataSourceStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <con:dataSource type="Excel">
+        <con:configuration>
+          <file>${projectDir}/TestData/TestData.xlsx</file>
+          <worksheet>Data</worksheet>
+          <cell>A2</cell>
+          <ignoreEmpty>false</ignoreEmpty>
+          <evaluateFormulas>false</evaluateFormulas>
+        </con:configuration>
+      </con:dataSource>
+      <con:shared>true</con:shared>
+      <con:restartShared>true</con:restartShared>
+      <con:property>Sl.No</con:property>
+      <con:property>PetName</con:property>
+      <con:property>PetId</con:property>
+      <con:completeLastOperation>true</con:completeLastOperation>
+      <con:restartOnRun>true</con:restartOnRun>
+    </con:config>
+  </con:testStep>
   <con:testStep type="restrequest" name="POST_Request" id="d7c7f0e5-6cc1-4ddf-9008-d2665060f47c">
     <con:settings/>
     <con:config service="https://petstore.swagger.io" resourcePath="/v2/pet" methodName="Pet" xsi:type="con:RestRequestStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
@@ -18,7 +46,7 @@
     "id": 0,
     "name": "string"
   },
-  "name": "Abd",
+  "name": "${ds_PetData#PetName}",
   "photoUrls": [
     "string"
   ],
@@ -31,11 +59,22 @@
   "status": "available"
 }</con:request>
         <con:originalUri>https://petstore.swagger.io/v2/pet</con:originalUri>
+        <con:assertion type="JsonPath RegEx Match" id="4652af33-2440-4ccd-83f6-e6a230b30c05" name="JsonPath RegEx Match">
+          <con:configuration>
+            <path>$['id']</path>
+            <content>true</content>
+            <allowWildcards>false</allowWildcards>
+            <ignoreNamspaceDifferences>false</ignoreNamspaceDifferences>
+            <ignoreComments>false</ignoreComments>
+            <regEx>\d{19}</regEx>
+          </con:configuration>
+        </con:assertion>
         <con:credentials>
           <con:selectedAuthProfile>No Authorization</con:selectedAuthProfile>
           <con:authType>No Authorization</con:authType>
         </con:credentials>
         <con:jmsConfig JMSDeliveryMode="PERSISTENT"/>
+        <con:jmsPropertyConfig/>
         <con:parameters/>
         <con:parameterOrder/>
       </con:restRequest>
@@ -49,6 +88,8 @@
         <con:sourceType>Response</con:sourceType>
         <con:sourceStep>POST_Request</con:sourceStep>
         <con:sourcePath>$['id']</con:sourcePath>
+        <con:targetType>PetId</con:targetType>
+        <con:targetStep>Properties</con:targetStep>
         <con:targetPath/>
         <con:type>JSONPATH</con:type>
         <con:upgraded>true</con:upgraded>
@@ -61,27 +102,106 @@
       <con:properties>
         <con:property>
           <con:name>PetId</con:name>
+          <con:value>9199424981609279998</con:value>
         </con:property>
       </con:properties>
     </con:config>
   </con:testStep>
-  <con:testStep type="datasource" name="DataSource" id="11d6114b-46cb-48c6-b24e-d499d8c201c0">
+  <con:testStep type="groovy" name="gs_Compare" id="f40ee386-290e-41f8-b00e-31cb47be575b">
     <con:settings/>
-    <con:config xsi:type="con:DataSourceStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
-      <con:shared>true</con:shared>
-      <con:restartShared>true</con:restartShared>
-      <con:restartOnRun>true</con:restartOnRun>
+    <con:config>
+      <script>def expectedId = context.expand('${ds_PetData#PetId}')
+def actualPetId = context.expand( '${Properties#PetId}' )
+
+if(expectedId == actualPetId)
+{
+	testRunner.testCase.setPropertyValue('Status', "Pass")
+}
+else
+{
+	testRunner.testCase.setPropertyValue('Status', "Fail")
+}</script>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="datasink" name="dataSink_Result" id="39a2a4b9-5d89-4e34-a045-76005b0b26bb">
+    <con:settings/>
+    <con:config xsi:type="con:DataSinkStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <con:dataSink type="Excel">
+        <con:configuration>
+          <file>${projectDir}/TestData/Result.xlsx</file>
+          <outfile>${projectDir}/TestData/Result.xlsx</outfile>
+          <worksheet>Result</worksheet>
+          <cell>A2</cell>
+          <evaluateFormulas>false</evaluateFormulas>
+          <append>false</append>
+        </con:configuration>
+      </con:dataSink>
+      <con:properties>
+        <con:property>
+          <con:name>Sl.No</con:name>
+          <con:value>${ds_PetData#Sl.No}</con:value>
+        </con:property>
+        <con:property>
+          <con:name>PetName</con:name>
+          <con:value>${ds_PetData#PetName}</con:value>
+        </con:property>
+        <con:property>
+          <con:name>PetId</con:name>
+          <con:value>${ds_PetData#PetId}</con:value>
+        </con:property>
+        <con:property>
+          <con:name>ActualPetId</con:name>
+          <con:value>${Properties#PetId}</con:value>
+        </con:property>
+        <con:property>
+          <con:name>Status</con:name>
+          <con:value>${#TestCase#Status}</con:value>
+        </con:property>
+      </con:properties>
     </con:config>
   </con:testStep>
   <con:testStep type="datasourceloop" name="DataSource Loop" id="75072076-fd95-4262-bcc6-2c61561242ac">
     <con:settings/>
     <con:config>
-      <dataSourceStep/>
-      <targetStep/>
+      <dataSourceStep>ds_PetData</dataSourceStep>
+      <targetStep>POST_Request</targetStep>
       <discardResults>true</discardResults>
     </con:config>
   </con:testStep>
-  <con:properties/>
+  <con:testStep type="groovy" name="Groovy Script" id="53859d9b-f201-466b-abb4-f2954e581243">
+    <con:settings/>
+    <con:config>
+      <script>/*def projectPath = context.expand('${projectDir}')
+log.info projectPath*/
+
+testRunner.testCase.testSuite.project.getTestSuiteByName("abc").getTestCaseByName("asas").getTestStepByName("Delay").setDisabled(false)
+
+testRunner.gotoStepByName("gs")
+
+testRunner.testCase.getTestStepByName("gs").run(testRunner, context)</script>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="datasource" name="DataSource" id="1068847d-7437-4936-93e9-95dc5956a25e">
+    <con:settings/>
+    <con:config xsi:type="con:DataSourceStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <con:shared>true</con:shared>
+      <con:restartShared>true</con:restartShared>
+      <con:completeLastOperation>true</con:completeLastOperation>
+      <con:restartOnRun>true</con:restartOnRun>
+    </con:config>
+  </con:testStep>
+  <con:testStep type="groovy" name="gs" id="28d85770-da65-4e19-a8ea-88d3336aac59">
+    <con:settings/>
+    <con:config>
+      <script>log.info "hello"</script>
+    </con:config>
+  </con:testStep>
+  <con:properties>
+    <con:property>
+      <con:name>Status</con:name>
+      <con:value>Fail</con:value>
+    </con:property>
+  </con:properties>
   <con:reportParameters/>
   <con:breakPoints>
     <con:testStepId>abdccf56-0dcc-4249-91d4-e3e17741703f</con:testStepId>
@@ -90,6 +210,41 @@
   </con:breakPoints>
   <con:breakPoints>
     <con:testStepId>e95047b0-7f33-49ff-ab23-dcdb3bd780d0</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>53859d9b-f201-466b-abb4-f2954e581243</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>f40ee386-290e-41f8-b00e-31cb47be575b</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>39a2a4b9-5d89-4e34-a045-76005b0b26bb</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>d210eab1-1a23-401d-b97b-84dcafba36cf</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>d7c7f0e5-6cc1-4ddf-9008-d2665060f47c</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>75072076-fd95-4262-bcc6-2c61561242ac</con:testStepId>
+    <con:status>NONE</con:status>
+    <con:properties/>
+  </con:breakPoints>
+  <con:breakPoints>
+    <con:testStepId>28d85770-da65-4e19-a8ea-88d3336aac59</con:testStepId>
     <con:status>NONE</con:status>
     <con:properties/>
   </con:breakPoints>
