@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <con:soapui-project id="16365aa9-bd09-4dd2-af1d-cdcdc26ec51c" created="2.5.0" activeEnvironment="Default environment" name="PetProject" resourceRoot="" updated="2.5.0" encryptionMode="Not encrypted" compositeProjectFormat="1.3" xmlns:con="http://eviware.com/soapui/config">
-  <con:settings/>
+  <con:settings>
+    <con:setting id="16365aa9-bd09-4dd2-af1d-cdcdc26ec51cfileName">PetProject3</con:setting>
+  </con:settings>
   <con:vcsConfiguration>
     <con:vcsName>Git</con:vcsName>
     <con:repositoryIdentifier>https://github.com/DipayanKoley/SOAPUI.git</con:repositoryIdentifier>
