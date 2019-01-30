@@ -65,6 +65,14 @@
       </con:properties>
     </con:config>
   </con:testStep>
+  <con:testStep type="datasource" name="DataSource" id="11d6114b-46cb-48c6-b24e-d499d8c201c0">
+    <con:settings/>
+    <con:config xsi:type="con:DataSourceStep" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+      <con:shared>true</con:shared>
+      <con:restartShared>true</con:restartShared>
+      <con:restartOnRun>true</con:restartOnRun>
+    </con:config>
+  </con:testStep>
   <con:properties/>
   <con:reportParameters/>
   <con:breakPoints>
