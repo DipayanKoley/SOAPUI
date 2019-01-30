@@ -73,6 +73,14 @@
       <con:restartOnRun>true</con:restartOnRun>
     </con:config>
   </con:testStep>
+  <con:testStep type="datasourceloop" name="DataSource Loop" id="75072076-fd95-4262-bcc6-2c61561242ac">
+    <con:settings/>
+    <con:config>
+      <dataSourceStep/>
+      <targetStep/>
+      <discardResults>true</discardResults>
+    </con:config>
+  </con:testStep>
   <con:properties/>
   <con:reportParameters/>
   <con:breakPoints>
